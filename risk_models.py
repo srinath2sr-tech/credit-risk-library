@@ -72,6 +72,24 @@ class MonteCarloVaR(RiskModel):
         simulated = np.random.normal(self.mean, self.std, self.simulations)
         return float(np.percentile(simulated, (1 - self.confidence) * 100))
 
+class StressVaR(RiskModel):
+    """
+    Stress VaR.
+    Applies a market shock factor to simulate crisis scenarios (e.g. 2008, COVID).
+    Used in ICAAP and RAF stress testing exercises.
+    """
+
+    def __init__(self, returns: list, shock_factor: float = 2.5,
+                 confidence: float = 0.99):
+        super().__init__(name="Stress VaR")
+        self.returns = returns
+        self.shock_factor = shock_factor
+        self.confidence = confidence
+
+    def compute(self) -> float:
+        stressed = [r * self.shock_factor for r in self.returns]
+        return float(np.percentile(stressed, (1 - self.confidence) * 100))
+
 
 # ── Quick test when file is run directly ──────────────────────────────────────
 if __name__ == "__main__":
@@ -84,6 +102,7 @@ if __name__ == "__main__":
         HistoricalVaR(returns=returns, confidence=0.99),
         ParametricVaR(mean=mean, std=std, confidence=0.99),
         MonteCarloVaR(mean=mean, std=std, confidence=0.99),
+        StressVaR(returns=returns, shock_factor=2.5, confidence=0.99),
     ]
 
     print("===== Daily VaR Report (99% Confidence) =====")
