@@ -1,5 +1,5 @@
 """
-credit-risk-library
+market-risk-library
 ====================
 Market Risk VaR Analytics Library
 Author: Srinath Reddy
